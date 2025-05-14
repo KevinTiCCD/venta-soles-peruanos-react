@@ -29,6 +29,7 @@ export interface Credential {
   id: string;
   name: string;
   description?: string;
+  password?: string;
   createdAt: Date;
 }
 

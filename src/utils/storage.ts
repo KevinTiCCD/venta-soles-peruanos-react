@@ -104,8 +104,9 @@ export const initializeData = (): void => {
 
   if (getCredentials().length === 0) {
     create<Credential>('credential', {
-      name: 'Credencial Ejemplo',
-      description: 'Descripción de la credencial',
+      name: 'admin',
+      password: 'admin',
+      description: 'Administrador del sistema',
     } as Credential);
   }
 };

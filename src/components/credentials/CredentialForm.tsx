@@ -14,9 +14,10 @@ interface CredentialFormProps {
 }
 
 const CredentialForm = ({ credential, onSubmit, onCancel }: CredentialFormProps) => {
-  const [formData, setFormData] = useState<Omit<Credential, 'id' | 'createdAt'>>({
+  const [formData, setFormData] = useState<Omit<Credential, 'id' | 'createdAt'> & { password?: string }>({
     name: '',
     description: '',
+    password: ''
   });
 
   useEffect(() => {
@@ -24,6 +25,7 @@ const CredentialForm = ({ credential, onSubmit, onCancel }: CredentialFormProps)
       setFormData({
         name: credential.name,
         description: credential.description || '',
+        password: ''
       });
     }
   }, [credential]);
@@ -37,10 +39,17 @@ const CredentialForm = ({ credential, onSubmit, onCancel }: CredentialFormProps)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Eliminar el campo password si está vacío para que no quede en el objeto final
+    const submitData = {...formData};
+    if (!submitData.password) {
+      delete submitData.password;
+    }
+    
     if (credential) {
-      onSubmit({ ...formData, id: credential.id, createdAt: credential.createdAt });
+      onSubmit({ ...submitData, id: credential.id, createdAt: credential.createdAt });
     } else {
-      onSubmit(formData);
+      onSubmit(submitData);
     }
   };
 
@@ -52,14 +61,27 @@ const CredentialForm = ({ credential, onSubmit, onCancel }: CredentialFormProps)
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nombre *</Label>
+            <Label htmlFor="name">Nombre de Usuario *</Label>
             <Input 
               id="name"
               name="name" 
               value={formData.name} 
               onChange={handleChange} 
-              placeholder="Nombre de la credencial"
+              placeholder="Nombre de usuario para acceso"
               required
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="password">Contraseña {credential ? '(Dejar en blanco para mantener la actual)' : '*'}</Label>
+            <Input 
+              id="password"
+              name="password" 
+              type="password"
+              value={formData.password} 
+              onChange={handleChange} 
+              placeholder={credential ? "••••••••" : "Contraseña para acceso"}
+              required={!credential}
             />
           </div>
 
