@@ -83,7 +83,7 @@ const SaleReceipt = ({ sale, onClose }: SaleReceiptProps) => {
               </div>
               
               <div className="receipt-footer">
-                <p>¡Gracias por su compra!</p>
+                <p>¡Gracias por su pago!</p>
                 <p>VentasPro - Sistema de Gestión</p>
               </div>
             </div>
