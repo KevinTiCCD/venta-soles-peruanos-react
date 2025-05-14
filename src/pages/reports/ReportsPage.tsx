@@ -1,24 +1,11 @@
 
 import { useState, useEffect } from 'react';
 import Dashboard from '@/components/Layout/Dashboard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSales, getClients, getSellers, getConcepts } from '@/utils/storage';
-import { formatCurrency } from '@/utils/printUtils';
 import { Sale } from '@/utils/types';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileText, Filter, CalendarRange } from 'lucide-react';
-import { ChartContainer } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { FilterSection } from '@/components/reports/FilterSection';
+import { ChartSection } from '@/components/reports/ChartSection';
+import { ResultsTable } from '@/components/reports/ResultsTable';
 
 const ReportsPage = () => {
   const [sales, setSales] = useState<Sale[]>([]);
@@ -35,26 +22,6 @@ const ReportsPage = () => {
   const [conceptId, setConceptId] = useState<string>('');
   const [month, setMonth] = useState<string>('');
   const [year, setYear] = useState<string>('');
-
-  // Meses en español para el filtro
-  const months = [
-    { value: '0', label: 'Enero' },
-    { value: '1', label: 'Febrero' },
-    { value: '2', label: 'Marzo' },
-    { value: '3', label: 'Abril' },
-    { value: '4', label: 'Mayo' },
-    { value: '5', label: 'Junio' },
-    { value: '6', label: 'Julio' },
-    { value: '7', label: 'Agosto' },
-    { value: '8', label: 'Septiembre' },
-    { value: '9', label: 'Octubre' },
-    { value: '10', label: 'Noviembre' },
-    { value: '11', label: 'Diciembre' }
-  ];
-
-  // Años para el filtro (5 años atrás y 5 años adelante)
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 11 }, (_, i) => (currentYear - 5 + i).toString());
 
   useEffect(() => {
     // Load data
@@ -195,230 +162,37 @@ const ReportsPage = () => {
 
   return (
     <Dashboard title="Reportes">
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Filter className="mr-2 h-5 w-5" />
-            Filtros de Reportes
-          </CardTitle>
-          <CardDescription>
-            Configure los filtros para generar reportes específicos
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="month">Mes</Label>
-              <Select
-                value={month}
-                onValueChange={setMonth}
-              >
-                <SelectTrigger id="month">
-                  <SelectValue placeholder="Seleccione mes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todos los meses</SelectItem>
-                  {months.map(month => (
-                    <SelectItem key={month.value} value={month.value}>
-                      {month.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="year">Año</Label>
-              <Select
-                value={year}
-                onValueChange={setYear}
-              >
-                <SelectTrigger id="year">
-                  <SelectValue placeholder="Seleccione año" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todos los años</SelectItem>
-                  {years.map(year => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2 mb-4">
-            <CalendarRange className="h-5 w-5" />
-            <span className="font-medium">O seleccione un rango de fechas:</span>
-          </div>
+      <FilterSection 
+        clients={clients}
+        sellers={sellers}
+        concepts={concepts}
+        startDate={startDate}
+        endDate={endDate}
+        clientId={clientId}
+        sellerId={sellerId}
+        conceptId={conceptId}
+        month={month}
+        year={year}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
+        setClientId={setClientId}
+        setSellerId={setSellerId}
+        setConceptId={setConceptId}
+        setMonth={setMonth}
+        setYear={setYear}
+        handleResetFilters={handleResetFilters}
+      />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="startDate">Fecha inicio</Label>
-              <Input
-                id="startDate"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="endDate">Fecha fin</Label>
-              <Input
-                id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="clientFilter">Cliente</Label>
-              <Select
-                value={clientId}
-                onValueChange={setClientId}
-              >
-                <SelectTrigger id="clientFilter">
-                  <SelectValue placeholder="Todos los clientes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todos los clientes</SelectItem>
-                  {clients.map(client => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="sellerFilter">Vendedor</Label>
-              <Select
-                value={sellerId}
-                onValueChange={setSellerId}
-              >
-                <SelectTrigger id="sellerFilter">
-                  <SelectValue placeholder="Todos los vendedores" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todos los vendedores</SelectItem>
-                  {sellers.map(seller => (
-                    <SelectItem key={seller.id} value={seller.id}>
-                      {seller.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="conceptFilter">Concepto</Label>
-              <Select
-                value={conceptId}
-                onValueChange={setConceptId}
-              >
-                <SelectTrigger id="conceptFilter">
-                  <SelectValue placeholder="Todos los conceptos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todos los conceptos</SelectItem>
-                  {concepts.map(concept => (
-                    <SelectItem key={concept.id} value={concept.id}>
-                      {concept.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="flex items-end">
-              <Button onClick={handleResetFilters} variant="outline" className="w-full">
-                Restablecer Filtros
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <ChartSection chartData={chartData} />
 
-      {chartData.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Análisis de Ventas por Concepto</CardTitle>
-            <CardDescription>
-              Distribución de ventas según concepto para el periodo seleccionado
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="w-full h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                  <Legend />
-                  <Bar dataKey="amount" name="Monto (S/)" fill="#4f46e5" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Resultados</CardTitle>
-          <CardDescription>
-            Se encontraron {filteredSales.length} ventas | Total: {formatCurrency(totalAmount)}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Vendedor</TableHead>
-                  <TableHead>Concepto</TableHead>
-                  <TableHead className="text-right">Monto</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredSales.length > 0 ? (
-                  filteredSales.map((sale) => (
-                    <TableRow key={sale.id}>
-                      <TableCell>{formatDate(sale.date)}</TableCell>
-                      <TableCell>{getClientName(sale.clientId)}</TableCell>
-                      <TableCell>{getSellerName(sale.sellerId)}</TableCell>
-                      <TableCell>{getConceptName(sale.conceptId)}</TableCell>
-                      <TableCell className="text-right font-medium">{formatCurrency(sale.amount)}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                      No se encontraron ventas con los filtros aplicados
-                    </TableCell>
-                  </TableRow>
-                )}
-                {filteredSales.length > 0 && (
-                  <TableRow className="bg-muted/50">
-                    <TableCell colSpan={4} className="text-right font-bold">
-                      Total:
-                    </TableCell>
-                    <TableCell className="text-right font-bold">
-                      {formatCurrency(totalAmount)}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+      <ResultsTable 
+        filteredSales={filteredSales}
+        totalAmount={totalAmount}
+        getClientName={getClientName}
+        getSellerName={getSellerName}
+        getConceptName={getConceptName}
+        formatDate={formatDate}
+      />
     </Dashboard>
   );
 };
