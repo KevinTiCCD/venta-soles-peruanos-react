@@ -75,7 +75,7 @@ const SalesPage = () => {
         <p className="text-muted-foreground">
           Registra y administra tus ventas
         </p>
-        <Button onClick={handleAddNew}>
+        <Button variant="secondary" onClick={handleAddNew}>
           <Plus className="mr-2 h-4 w-4" />
           Nueva Venta
         </Button>

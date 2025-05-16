@@ -29,7 +29,7 @@ const SaleReceipt = ({ sale, onClose }: SaleReceiptProps) => {
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
             <span>Comprobante de Venta</span>
-            <Button variant="outline" onClick={handlePrint}>
+            <Button variant="secondary" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
               Imprimir
             </Button>

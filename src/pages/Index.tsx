@@ -120,7 +120,7 @@ const Index = () => {
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link to="/ventas">
-              <Button className="w-full">Nueva Venta</Button>
+              <Button variant="secondary" className="w-full">Nueva Venta</Button>
             </Link>
             <Link to="/clientes">
               <Button variant="outline" className="w-full">Gestionar Clientes</Button>
